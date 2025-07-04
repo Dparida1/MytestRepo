@@ -1,14 +1,14 @@
 # AWS WorkSpace Manager - Complete Beginner's Guide
 
-This guide will help you get started with the AWS WorkSpace Manager web application from scratch. No prior experience with ASP.NET Core required!
+This guide will help you get started with the AWS WorkSpace Manager web application from scratch. No prior experience with ASP.NET Web Forms required!
 
 ## 📋 What You'll Need
 
 ### Software Prerequisites
-1. **Windows 10/11** (recommended) or **macOS/Linux**
-2. **.NET 8.0 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/8.0)
+1. **Windows 10/11** (recommended) or **Windows Server**
+2. **.NET Framework 4.8** - [Download here](https://dotnet.microsoft.com/download/dotnet-framework/net48)
 3. **Visual Studio Community 2022** (free) - [Download here](https://visualstudio.microsoft.com/vs/community/)
-   - Alternative: **Visual Studio Code** (free) - [Download here](https://code.visualstudio.com/)
+   - Make sure to select **ASP.NET and web development** workload during installation
 4. **SQL Server LocalDB** (comes with Visual Studio) or **SQL Server Express** (free)
 
 ### AWS Prerequisites

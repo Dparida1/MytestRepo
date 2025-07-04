@@ -3,37 +3,29 @@
 For experienced developers who just want to get up and running quickly.
 
 ## Prerequisites
-- .NET 8.0 SDK
+- .NET Framework 4.8
+- Visual Studio 2022 with ASP.NET workload
 - SQL Server LocalDB (comes with Visual Studio) or SQL Server Express
 - AWS credentials configured
 
-## 1. Setup (Windows)
+## 1. Setup (Windows only - Web Forms requires Windows/IIS)
 ```cmd
 setup.cmd
 ```
 
-## 2. Setup (Linux/macOS)
-```bash
-chmod +x setup.sh
-./setup.sh
+## 2. Configure AWS
+Edit `web.config`:
+```xml
+<appSettings>
+  <add key="AWS_Region" value="us-east-1" />
+  <add key="AWS_Profile" value="your-aws-profile" />
+</appSettings>
 ```
 
-## 3. Configure AWS
-Edit `appsettings.json`:
-```json
-{
-  "AWS": {
-    "Profile": "your-aws-profile",
-    "Region": "us-east-1"
-  }
-}
-```
-
-## 4. Run
-```bash
-dotnet run
-```
-Navigate to `https://localhost:5001`
+## 3. Run
+- Open `WorkSpaceManager.sln` in Visual Studio
+- Press `F5` to run
+- Or use IIS Express from Visual Studio
 
 ## 5. First Use
 1. Click "Sync from AWS" on dashboard
