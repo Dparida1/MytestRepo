@@ -1,0 +1,448 @@
+@model WorkSpaceManager.Models.CreateWorkSpaceRequestViewModel
+@{
+    ViewData["Title"] = "Create WorkSpaces";
+}
+
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-plus me-2"></i>Create WorkSpaces
+        </h1>
+        <p class="text-muted">Create multiple AWS WorkSpaces with specified parameters</p>
+    </div>
+    <div class="col-auto">
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-cog me-2"></i>WorkSpace Configuration
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="createForm">
+                    <div asp-validation-summary="All" class="alert alert-danger" style="display: none;"></div>
+                    
+                    <!-- Basic Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Basic Information
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="RequestName" class="form-label">Request Name</label>
+                            <input asp-for="RequestName" class="form-control" placeholder="e.g., Dev Team Q1 2024" />
+                            <span asp-validation-for="RequestName" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="NumberOfWorkSpaces" class="form-label">Number of WorkSpaces</label>
+                            <input asp-for="NumberOfWorkSpaces" type="number" min="1" max="100" class="form-control" />
+                            <span asp-validation-for="NumberOfWorkSpaces" class="text-danger"></span>
+                            <div class="form-text">Maximum 100 WorkSpaces per request</div>
+                        </div>
+                    </div>
+                    
+                    <!-- AWS Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-cloud me-2"></i>AWS Configuration
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Region" class="form-label">AWS Region</label>
+                            <select asp-for="Region" class="form-select" id="regionSelect">
+                                <option value="">Select Region</option>
+                                @foreach (var region in Model.AvailableRegions)
+                                {
+                                    <option value="@region">@region</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Region" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="BundleId" class="form-label">Bundle</label>
+                            <select asp-for="BundleId" class="form-select" id="bundleSelect" disabled>
+                                <option value="">Select Bundle</option>
+                            </select>
+                            <span asp-validation-for="BundleId" class="text-danger"></span>
+                            <div class="form-text">Select region first</div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="DirectoryId" class="form-label">Directory</label>
+                            <select asp-for="DirectoryId" class="form-select" id="directorySelect" disabled>
+                                <option value="">Select Directory</option>
+                            </select>
+                            <span asp-validation-for="DirectoryId" class="text-danger"></span>
+                            <div class="form-text">Select region first</div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-users me-2"></i>User Configuration
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="UserNamePrefix" class="form-label">Username Prefix</label>
+                            <input asp-for="UserNamePrefix" class="form-control" placeholder="e.g., dev-user" />
+                            <span asp-validation-for="UserNamePrefix" class="text-danger"></span>
+                            <div class="form-text">Users will be named: prefix001, prefix002, etc.</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-label">Preview Usernames</div>
+                            <div class="border rounded p-2 bg-light" id="usernamePreview">
+                                <small class="text-muted">Enter prefix and count to see preview</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-shield-alt me-2"></i>Security Configuration
+                            </h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mb-2">
+                                <input asp-for="RootVolumeEncrypted" class="form-check-input" />
+                                <label asp-for="RootVolumeEncrypted" class="form-check-label">
+                                    Enable Root Volume Encryption
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input asp-for="UserVolumeEncrypted" class="form-check-input" />
+                                <label asp-for="UserVolumeEncrypted" class="form-check-label">
+                                    Enable User Volume Encryption
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="EncryptionKey" class="form-label">Encryption Key (Optional)</label>
+                            <input asp-for="EncryptionKey" class="form-control" placeholder="AWS KMS Key ID or ARN" />
+                            <span asp-validation-for="EncryptionKey" class="text-danger"></span>
+                            <div class="form-text">Leave empty to use default AWS managed key</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label asp-for="Notes" class="form-label">Notes (Optional)</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Additional notes or comments about this request"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                WorkSpaces will be created asynchronously. Check the dashboard for progress.
+                            </small>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-outline-secondary me-2" onclick="resetForm()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-plus me-1"></i>Create WorkSpaces
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Cost Estimate -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-calculator me-2"></i>Cost Estimate
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="costEstimate">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                        <p class="mb-0">Select configuration to estimate cost</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bundle Information -->
+        <div class="card mb-3" id="bundleInfo" style="display: none;">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-box me-2"></i>Bundle Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="bundleDetails">
+                    <!-- Bundle details will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Requirements -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Requirements
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Valid AWS credentials with WorkSpaces permissions
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Active directory service in selected region
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Sufficient WorkSpaces quota
+                    </li>
+                    <li class="mb-0">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Network connectivity configured
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    $(document).ready(function() {
+        updateUsernamePreview();
+        
+        // Region change handler
+        $('#regionSelect').change(function() {
+            const region = $(this).val();
+            if (region) {
+                loadBundles(region);
+                loadDirectories(region);
+            } else {
+                $('#bundleSelect, #directorySelect').prop('disabled', true).html('<option value="">Select Region First</option>');
+                $('#bundleInfo').hide();
+            }
+        });
+        
+        // Bundle change handler
+        $('#bundleSelect').change(function() {
+            const bundleId = $(this).val();
+            if (bundleId) {
+                showBundleInfo(bundleId);
+                updateCostEstimate();
+            } else {
+                $('#bundleInfo').hide();
+            }
+        });
+        
+        // Update username preview when inputs change
+        $('#@Html.IdFor(m => m.UserNamePrefix), #@Html.IdFor(m => m.NumberOfWorkSpaces)').on('input', updateUsernamePreview);
+        
+        // Form submission
+        $('#createForm').submit(function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return false;
+            }
+            
+            showLoading('Creating WorkSpaces...');
+            $('#submitBtn').prop('disabled', true);
+            
+            this.submit();
+        });
+    });
+    
+    function loadBundles(region) {
+        $.get('@Url.Action("GetBundlesForRegion", "WorkSpace")', { region: region })
+            .done(function(data) {
+                const select = $('#bundleSelect');
+                select.html('<option value="">Select Bundle</option>');
+                
+                $.each(data, function(i, bundle) {
+                    select.append(`<option value="${bundle.value}">${bundle.text}</option>`);
+                });
+                
+                select.prop('disabled', false);
+            })
+            .fail(function() {
+                showAlert('danger', 'Failed to load bundles for region ' + region);
+            });
+    }
+    
+    function loadDirectories(region) {
+        $.get('@Url.Action("GetDirectoriesForRegion", "WorkSpace")', { region: region })
+            .done(function(data) {
+                const select = $('#directorySelect');
+                select.html('<option value="">Select Directory</option>');
+                
+                $.each(data, function(i, directory) {
+                    select.append(`<option value="${directory.value}">${directory.text}</option>`);
+                });
+                
+                select.prop('disabled', false);
+            })
+            .fail(function() {
+                showAlert('danger', 'Failed to load directories for region ' + region);
+            });
+    }
+    
+    function showBundleInfo(bundleId) {
+        // This would typically fetch bundle details from the server
+        $('#bundleInfo').show();
+        $('#bundleDetails').html(`
+            <div class="mb-2">
+                <strong>Bundle ID:</strong><br>
+                <code>${bundleId}</code>
+            </div>
+            <div class="mb-2">
+                <strong>Description:</strong><br>
+                <small class="text-muted">Bundle information will be loaded from AWS</small>
+            </div>
+        `);
+    }
+    
+    function updateUsernamePreview() {
+        const prefix = $('#@Html.IdFor(m => m.UserNamePrefix)').val() || 'user';
+        const count = parseInt($('#@Html.IdFor(m => m.NumberOfWorkSpaces)').val()) || 1;
+        
+        if (count > 0 && count <= 10) {
+            let preview = '';
+            for (let i = 1; i <= count; i++) {
+                preview += `${prefix}${i.toString().padStart(3, '0')}`;
+                if (i < count) preview += ', ';
+            }
+            $('#usernamePreview').html(`<code>${preview}</code>`);
+        } else if (count > 10) {
+            $('#usernamePreview').html(`
+                <code>${prefix}001, ${prefix}002, ${prefix}003, ... ${prefix}${count.toString().padStart(3, '0')}</code>
+                <br><small class="text-muted">${count} usernames total</small>
+            `);
+        } else {
+            $('#usernamePreview').html('<small class="text-muted">Enter prefix and count to see preview</small>');
+        }
+    }
+    
+    function updateCostEstimate() {
+        const count = parseInt($('#@Html.IdFor(m => m.NumberOfWorkSpaces)').val()) || 0;
+        const bundleId = $('#bundleSelect').val();
+        
+        if (count > 0 && bundleId) {
+            // This is a simplified cost estimate - you'd want to get actual pricing from AWS
+            const estimatedMonthlyCost = count * 35; // $35 per WorkSpace per month (example)
+            
+            $('#costEstimate').html(`
+                <div class="text-center">
+                    <h4 class="text-primary mb-2">$${estimatedMonthlyCost}</h4>
+                    <p class="mb-1">Estimated monthly cost</p>
+                    <small class="text-muted">
+                        ${count} WorkSpace${count > 1 ? 's' : ''} × ~$35/month
+                    </small>
+                </div>
+                <hr>
+                <small class="text-warning">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Estimate only. Actual costs may vary based on usage.
+                </small>
+            `);
+        } else {
+            $('#costEstimate').html(`
+                <div class="text-center text-muted">
+                    <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                    <p class="mb-0">Select configuration to estimate cost</p>
+                </div>
+            `);
+        }
+    }
+    
+    function validateForm() {
+        const region = $('#regionSelect').val();
+        const bundle = $('#bundleSelect').val();
+        const directory = $('#directorySelect').val();
+        const count = parseInt($('#@Html.IdFor(m => m.NumberOfWorkSpaces)').val());
+        
+        if (!region) {
+            showAlert('danger', 'Please select an AWS region');
+            return false;
+        }
+        
+        if (!bundle) {
+            showAlert('danger', 'Please select a bundle');
+            return false;
+        }
+        
+        if (!directory) {
+            showAlert('danger', 'Please select a directory');
+            return false;
+        }
+        
+        if (!count || count < 1 || count > 100) {
+            showAlert('danger', 'Number of WorkSpaces must be between 1 and 100');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    function resetForm() {
+        if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+            $('#createForm')[0].reset();
+            $('#bundleSelect, #directorySelect').prop('disabled', true).html('<option value="">Select Region First</option>');
+            $('#bundleInfo').hide();
+            updateUsernamePreview();
+            updateCostEstimate();
+        }
+    }
+</script>
+}
+
+<style>
+    .border-bottom {
+        border-bottom: 2px solid #e9ecef !important;
+    }
+    
+    .form-check-label {
+        cursor: pointer;
+    }
+    
+    #usernamePreview {
+        min-height: 2.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+</style>
