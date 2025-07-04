@@ -1,0 +1,215 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="WorkSpaceManager.SiteMaster" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%: Page.Title %> - AWS WorkSpace Manager</title>
+
+    <webopt:bundleReference runat="server" path="~/Content/css" />
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background-color: #f8f9fa;
+        }
+        .main-content {
+            min-height: calc(100vh - 56px);
+        }
+        .stats-card {
+            transition: transform 0.2s;
+        }
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+        .workspace-state-badge {
+            font-size: 0.8em;
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .alert-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
+                <%--Framework Scripts--%>
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+            </Scripts>
+        </asp:ScriptManager>
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <asp:HyperLink ID="BrandLink" runat="server" NavigateUrl="~/Default.aspx" CssClass="navbar-brand">
+                    <i class="fas fa-cloud"></i> AWS WorkSpace Manager
+                </asp:HyperLink>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <asp:HyperLink ID="DashboardLink" runat="server" NavigateUrl="~/Default.aspx" CssClass="nav-link">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </asp:HyperLink>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-desktop"></i> WorkSpaces
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <asp:HyperLink ID="ViewWorkSpacesLink" runat="server" NavigateUrl="~/ViewWorkSpaces.aspx" CssClass="dropdown-item">
+                                        <i class="fas fa-list"></i> View All
+                                    </asp:HyperLink>
+                                </li>
+                                <li>
+                                    <asp:HyperLink ID="CreateWorkSpacesLink" runat="server" NavigateUrl="~/CreateWorkSpaces.aspx" CssClass="dropdown-item">
+                                        <i class="fas fa-plus"></i> Create New
+                                    </asp:HyperLink>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <asp:HyperLink ID="ReportsLink" runat="server" NavigateUrl="~/Reports.aspx" CssClass="nav-link">
+                                <i class="fas fa-chart-bar"></i> Reports
+                            </asp:HyperLink>
+                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <span class="navbar-text">
+                                <i class="fas fa-globe"></i> Region: 
+                                <asp:Label ID="CurrentRegionLabel" runat="server" Text="us-east-1" CssClass="fw-bold"></asp:Label>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Alert Container for notifications -->
+        <div class="alert-container">
+            <asp:Panel ID="AlertPanel" runat="server" Visible="false">
+                <div class="alert alert-dismissible fade show" role="alert">
+                    <asp:Label ID="AlertMessage" runat="server"></asp:Label>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </asp:Panel>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Main Content Area -->
+                <main class="col-12 main-content py-4">
+                    <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                    </asp:ContentPlaceHolder>
+                </main>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-light text-center py-3 mt-5">
+            <div class="container">
+                <span class="text-muted">
+                    © <%: DateTime.Now.Year %> AWS WorkSpace Manager. 
+                    Built with ASP.NET Web Forms and AWS SDK.
+                </span>
+            </div>
+        </footer>
+    </form>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    if (alert) {
+                        var bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            });
+        });
+
+        // Loading spinner functions
+        function showLoading(buttonId) {
+            var button = document.getElementById(buttonId);
+            if (button) {
+                button.disabled = true;
+                var spinner = button.querySelector('.loading-spinner');
+                if (spinner) {
+                    spinner.style.display = 'inline-block';
+                }
+            }
+        }
+
+        function hideLoading(buttonId) {
+            var button = document.getElementById(buttonId);
+            if (button) {
+                button.disabled = false;
+                var spinner = button.querySelector('.loading-spinner');
+                if (spinner) {
+                    spinner.style.display = 'none';
+                }
+            }
+        }
+
+        // Confirm deletion
+        function confirmDelete(message) {
+            return confirm(message || 'Are you sure you want to delete this item?');
+        }
+
+        // Confirm workspace operations
+        function confirmWorkSpaceOperation(operation, count) {
+            var message = 'Are you sure you want to ' + operation + ' ';
+            if (count > 1) {
+                message += count + ' WorkSpaces?';
+            } else {
+                message += 'this WorkSpace?';
+            }
+            return confirm(message);
+        }
+    </script>
+</body>
+</html>
