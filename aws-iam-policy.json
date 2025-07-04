@@ -1,0 +1,76 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "WorkSpacesFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "workspaces:CreateWorkspaces",
+                "workspaces:DescribeWorkspaces",
+                "workspaces:DescribeWorkspacesConnectionStatus",
+                "workspaces:DescribeWorkspaceSnapshots",
+                "workspaces:DescribeWorkspaceBundles",
+                "workspaces:DescribeWorkspaceDirectories",
+                "workspaces:DescribeWorkspaceImages",
+                "workspaces:StartWorkspaces",
+                "workspaces:StopWorkspaces",
+                "workspaces:RebootWorkspaces",
+                "workspaces:TerminateWorkspaces",
+                "workspaces:ModifyWorkspaceProperties",
+                "workspaces:ModifyWorkspaceState",
+                "workspaces:ModifyWorkspaceAccessProperties",
+                "workspaces:ModifyWorkspaceCreationProperties",
+                "workspaces:DescribeWorkspaceAccessProperties",
+                "workspaces:DescribeWorkspaceCreationProperties",
+                "workspaces:ListAvailableManagementCidrRanges",
+                "workspaces:DescribeAccount",
+                "workspaces:DescribeAccountModifications"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "DirectoryServiceReadAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ds:DescribeDirectories",
+                "ds:DescribeTrusts"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "EC2DescribeAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeImages",
+                "ec2:DescribeSnapshots",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeRegions"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "IAMReadAccess",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:ListRoles",
+                "iam:ListInstanceProfiles"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "KMSAccess",
+            "Effect": "Allow",
+            "Action": [
+                "kms:DescribeKey",
+                "kms:ListKeys",
+                "kms:ListAliases"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
